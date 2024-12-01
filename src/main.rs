@@ -16,12 +16,12 @@ pub trait Day {
         let example_input = &utils::read_input(Self::DAY_NUMBER, true).unwrap();
         let input = &utils::read_input(Self::DAY_NUMBER, false).unwrap();
 
-        debug_assert_eq!(Self::part1(example_input), Self::PART1_EXAMPLE_SOLUTION);
+        assert_eq!(Self::part1(example_input), Self::PART1_EXAMPLE_SOLUTION);
 
         let part1_solution = Self::part1(input);
         println!("day {} part 1: {}", Self::DAY_NUMBER, part1_solution);
 
-        debug_assert_eq!(Self::part2(example_input), Self::PART2_EXAMPLE_SOLUTION);
+        assert_eq!(Self::part2(example_input), Self::PART2_EXAMPLE_SOLUTION);
 
         let part2_solution = Self::part2(input);
         println!("day {} part 2: {}", Self::DAY_NUMBER, part2_solution);
