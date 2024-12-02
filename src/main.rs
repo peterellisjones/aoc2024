@@ -1,19 +1,21 @@
 use day1::Day1;
+use day2::Day2;
 
 mod utils;
 
 mod day1;
+mod day2;
 
 pub trait Day {
     const DAY_NUMBER: i64;
     const PART1_EXAMPLE_SOLUTION: i64;
     const PART2_EXAMPLE_SOLUTION: i64;
 
-    fn part1(raw_input: &str) -> i64 {
+    fn part1(_: &str) -> i64 {
         unimplemented!("day {} part 1 not yet implemented", Self::DAY_NUMBER);
     }
 
-    fn part2(raw_input: &str) -> i64 {
+    fn part2(_: &str) -> i64 {
         unimplemented!("day {} part 2 not yet implemented", Self::DAY_NUMBER);
     }
 
@@ -35,4 +37,5 @@ pub trait Day {
 
 fn main() {
     Day1::run();
+    Day2::run();
 }
