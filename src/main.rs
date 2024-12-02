@@ -1,5 +1,3 @@
-use day1::Day1;
-use day2::Day2;
 use std::time::Instant;
 
 mod utils;
@@ -45,6 +43,6 @@ pub trait Day {
 }
 
 fn main() {
-    Day1::run();
-    Day2::run();
+    day1::Day1::run();
+    day2::Day2::run();
 }
