@@ -1,11 +1,8 @@
 use std::fs::read_to_string;
 
 use nom::{
-    Finish, IResult,
-    character::{
-        complete::{i64 as nom_i64, line_ending, multispace1, space1},
-        is_space,
-    },
+    Finish,
+    character::complete::{i64 as nom_i64, line_ending, multispace1, space1},
     multi::{many1, separated_list1},
     sequence::{separated_pair, terminated},
 };
