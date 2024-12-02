@@ -1,11 +1,6 @@
-use std::collections::HashMap;
-
 use itertools::{FoldWhile, Itertools};
 
-use crate::{
-    Day,
-    utils::{parse_integer_list, parse_integer_pairs},
-};
+use crate::{Day, utils::parse_integer_list};
 
 pub struct Day2;
 
