@@ -7,9 +7,9 @@ use nom::{
     sequence::{separated_pair, terminated},
 };
 
-pub fn read_input(problem_number: i64, example: bool) -> Result<String, std::io::Error> {
-    let file_path = if example {
-        format!("assets/day{problem_number}_example.txt")
+pub fn read_input(problem_number: i64, example: Option<i64>) -> Result<String, std::io::Error> {
+    let file_path = if let Some(part) = example {
+        format!("assets/day{problem_number}_part{part}_example.txt")
     } else {
         format!("assets/day{problem_number}.txt")
     };
