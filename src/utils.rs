@@ -2,7 +2,7 @@ use std::fs::read_to_string;
 
 use nom::{
     Finish,
-    character::complete::{i64 as nom_i64, line_ending, multispace1, space1},
+    character::complete::{i64 as nom_i64, line_ending, multispace1, not_line_ending, space1},
     multi::{many1, separated_list1},
     sequence::{separated_pair, terminated},
 };
@@ -30,4 +30,10 @@ pub fn parse_integer_list(input: &str) -> Result<Vec<Vec<i64>>, nom::error::Erro
     many1(terminated(separated_list1(space1, nom_i64), line_ending))(input)
         .finish()
         .map(|(_, x)| x)
+}
+
+pub fn parse_char_grid(input: &str) -> Result<Vec<Vec<char>>, nom::error::Error<&str>> {
+    many1(terminated(not_line_ending, line_ending))(input)
+        .finish()
+        .map(|(_, x)| x.iter().map(|&y| y.chars().collect()).collect())
 }

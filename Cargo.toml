@@ -7,3 +7,5 @@ edition = "2024"
 itertools = "0.13.0"
 nom = "7.1.3"
 regex = "1.11.1"
+
+# RUSTFLAGS="-Clinker=rust-lld.exe -Ctarget-cpu=native" cargo run --profile dev
