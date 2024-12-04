@@ -1,5 +1,3 @@
-use core::num;
-
 use crate::{Day, utils::parse_char_grid};
 
 pub struct Day4;
