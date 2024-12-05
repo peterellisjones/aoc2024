@@ -27,11 +27,8 @@ impl Day for Day5 {
         let mut sum = 0;
 
         for pages in update_pages.iter() {
-            let mut pages_ordered = pages.clone();
-
-            pages_ordered.sort_by(|left, right| orderings.compare(left, right));
-
-            if pages.iter().eq(pages_ordered.iter()) {
+            if pages.is_sorted_by(|left, right| orderings.compare(left, right) != Ordering::Greater)
+            {
                 sum += pages[pages.len() / 2]
             }
         }
@@ -50,7 +47,6 @@ impl Day for Day5 {
 
             pages_ordered.sort_by(|left, right| orderings.compare(left, right));
 
-
             if !pages.iter().eq(pages_ordered.iter()) {
                 sum += pages_ordered[pages_ordered.len() / 2]
             }
@@ -59,7 +55,6 @@ impl Day for Day5 {
         sum
     }
 }
-
 
 struct Orderings(HashMap<i64, HashSet<i64>>);
 
