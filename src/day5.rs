@@ -6,7 +6,8 @@ use std::{
 use nom::{
     Finish,
     bytes::complete::tag,
-    character::complete::{i64 as nom_i64, line_ending, space1},
+    character::complete::{i64 as nom_i64, line_ending},
+    error::Error as NomError,
     multi::{many1, separated_list1},
     sequence::{separated_pair, terminated},
 };
@@ -93,7 +94,7 @@ impl Orderings {
     }
 }
 
-pub fn parse(input: &str) -> Result<(Vec<(i64, i64)>, Vec<Vec<i64>>), nom::error::Error<&str>> {
+pub fn parse(input: &str) -> Result<(Vec<(i64, i64)>, Vec<Vec<i64>>), NomError<&str>> {
     let page_ordering_pairs = many1(terminated(
         separated_pair(nom_i64, tag("|"), nom_i64),
         line_ending,
