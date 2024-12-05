@@ -18,6 +18,7 @@ fn main() {
 
 pub trait Day {
     const DAY_NUMBER: i64;
+
     const PART1_EXAMPLE_SOLUTION: i64;
     const PART2_EXAMPLE_SOLUTION: i64;
 
@@ -30,13 +31,18 @@ pub trait Day {
     }
 
     fn run() {
+        #[cfg(debug_assertions)]
         let example_part1_input = &utils::read_input(Self::DAY_NUMBER, Some(1)).unwrap();
+
+        #[cfg(debug_assertions)]
         let example_part2_input = &utils::read_input(Self::DAY_NUMBER, Some(2)).unwrap();
+
         let input = &utils::read_input(Self::DAY_NUMBER, None).unwrap();
 
         let now = Instant::now();
 
-        assert_eq!(
+        #[cfg(debug_assertions)]
+        debug_assert_eq!(
             Self::part1(example_part1_input),
             Self::PART1_EXAMPLE_SOLUTION
         );
@@ -46,6 +52,7 @@ pub trait Day {
         let part1_solution = Self::part1(input);
         println!("\tpart 1: {}", part1_solution);
 
+        #[cfg(debug_assertions)]
         assert_eq!(
             Self::part2(example_part2_input),
             Self::PART2_EXAMPLE_SOLUTION
