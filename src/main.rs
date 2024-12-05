@@ -47,10 +47,7 @@ pub trait Day {
             Self::PART1_EXAMPLE_SOLUTION
         );
 
-        println!("day {}:", Self::DAY_NUMBER);
-
         let part1_solution = Self::part1(input);
-        println!("\tpart 1: {}", part1_solution);
 
         #[cfg(debug_assertions)]
         assert_eq!(
@@ -59,10 +56,12 @@ pub trait Day {
         );
 
         let part2_solution = Self::part2(input);
-        println!("\tpart 2: {}", part2_solution);
 
         let elapsed = now.elapsed();
 
+        println!("day {}:", Self::DAY_NUMBER);
+        println!("\tpart 1: {}", part1_solution);
+        println!("\tpart 2: {}", part2_solution);
         println!("\ttime: {:.2?}", elapsed);
     }
 }
