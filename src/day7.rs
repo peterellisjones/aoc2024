@@ -1,11 +1,13 @@
 use nom::{
-    Finish, Slice,
+    Finish,
     bytes::complete::tag,
     character::complete::{i64 as nom_i64, line_ending, space1},
     error::Error as NomError,
     multi::{many1, separated_list1},
     sequence::{separated_pair, terminated},
 };
+
+use rayon::prelude::*;
 
 use crate::Day;
 
@@ -19,7 +21,7 @@ impl Day for Day7 {
     fn part1(raw_input: &str) -> i64 {
         parse(raw_input)
             .unwrap()
-            .iter()
+            .par_iter()
             .filter(|(target, inputs)| has_solution(*target, 0i64, inputs, false))
             .map(|(target, _)| target)
             .sum::<i64>()
@@ -28,7 +30,7 @@ impl Day for Day7 {
     fn part2(raw_input: &str) -> i64 {
         parse(raw_input)
             .unwrap()
-            .iter()
+            .par_iter()
             .filter(|(target, inputs)| has_solution(*target, 0i64, inputs, true))
             .map(|(target, _)| target)
             .sum::<i64>()

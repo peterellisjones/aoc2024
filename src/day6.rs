@@ -1,7 +1,7 @@
+use rayon::prelude::*;
 use std::collections::HashMap;
 
 use crate::{Day, utils::parse_char_grid};
-
 pub struct Day6;
 
 impl Day for Day6 {
@@ -23,7 +23,7 @@ impl Day for Day6 {
     }
 
     fn part2(raw_input: &str) -> i64 {
-        let mut map = parse_char_grid(raw_input).unwrap();
+        let map = parse_char_grid(raw_input).unwrap();
 
         let start_position = find_guard_start(&map);
         let start_direction: i64 = 0;
@@ -38,39 +38,24 @@ impl Day for Day6 {
 
         assert!(!found_loop);
 
-        let mut loops_found = 0;
+        (0..(path.len() - 1))
+            .into_par_iter()
+            .map(|i| {
+                let (start_position, start_direction) = path[i];
+                let (next_position, _) = path[i + 1];
 
-        // step along the path traced by the guard,
-        // and try placing an obstacle in front
-        // is there a loop?
-        let mut route_along_path: HashMap<(i64, i64), i64> = HashMap::new();
+                let mut route = HashMap::new();
 
-        for i in 0..(path.len() - 1) {
-            let (start_position, start_direction) = path[i];
-            let (next_position, _) = path[i + 1];
+                route.insert(start_position, start_direction);
 
-            route_along_path.insert(start_position, start_direction);
+                let mut map = map.clone();
+                map[next_position.0 as usize][next_position.1 as usize] = 'O';
 
-            let original_element = map[next_position.0 as usize][next_position.1 as usize];
+                let (found_loop, _) = walk_guard(start_position, start_direction, &map, &mut route);
 
-            map[next_position.0 as usize][next_position.1 as usize] = 'O';
-            let mut route_with_obstacles: HashMap<(i64, i64), i64> = route_along_path.clone();
-
-            let (found_loop, _) = walk_guard(
-                start_position,
-                start_direction,
-                &map,
-                &mut route_with_obstacles,
-            );
-
-            if found_loop {
-                loops_found += 1;
-            }
-
-            map[next_position.0 as usize][next_position.1 as usize] = original_element;
-        }
-
-        loops_found
+                if found_loop { 1 } else { 0 }
+            })
+            .sum()
     }
 }
 
