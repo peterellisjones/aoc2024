@@ -17,31 +17,21 @@ impl Day for Day7 {
     const PART2_EXAMPLE_SOLUTION: i64 = 11387;
 
     fn part1(raw_input: &str) -> i64 {
-        let equations = parse(raw_input).unwrap();
-
-        let mut total_calibration_result = 0;
-
-        for (target, inputs) in equations.iter() {
-            if has_solution(*target, 0i64, inputs, false) {
-                total_calibration_result += target;
-            }
-        }
-
-        total_calibration_result
+        parse(raw_input)
+            .unwrap()
+            .iter()
+            .filter(|(target, inputs)| has_solution(*target, 0i64, inputs, false))
+            .map(|(target, _)| target)
+            .sum::<i64>()
     }
 
     fn part2(raw_input: &str) -> i64 {
-        let equations = parse(raw_input).unwrap();
-
-        let mut total_calibration_result = 0;
-
-        for (target, inputs) in equations.iter() {
-            if has_solution(*target, 0i64, inputs, true) {
-                total_calibration_result += target;
-            }
-        }
-
-        total_calibration_result
+        parse(raw_input)
+            .unwrap()
+            .iter()
+            .filter(|(target, inputs)| has_solution(*target, 0i64, inputs, true))
+            .map(|(target, _)| target)
+            .sum::<i64>()
     }
 }
 
@@ -67,12 +57,7 @@ fn has_solution(
         let num_digits = 1 + (operand as f64).log10() as u32;
         let new_running_total = running_total * 10i64.pow(num_digits) + operand;
 
-        if has_solution(
-            target,
-            new_running_total,
-            inputs.slice(1..inputs.len()),
-            allow_concatenation,
-        ) {
+        if has_solution(target, new_running_total, &inputs[1..], allow_concatenation) {
             return true;
         }
     }
@@ -81,7 +66,7 @@ fn has_solution(
     if has_solution(
         target,
         running_total * inputs[0],
-        inputs.slice(1..inputs.len()),
+        &inputs[1..],
         allow_concatenation,
     ) {
         return true;
@@ -91,7 +76,7 @@ fn has_solution(
     if has_solution(
         target,
         running_total + inputs[0],
-        inputs.slice(1..inputs.len()),
+        &inputs[1..],
         allow_concatenation,
     ) {
         return true;
