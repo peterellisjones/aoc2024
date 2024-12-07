@@ -60,6 +60,8 @@ pub trait Day {
     }
 
     fn run() {
+        println!("day {}:", Self::DAY_NUMBER);
+
         #[cfg(debug_assertions)]
         let example_part1_input = &utils::read_input(Self::DAY_NUMBER, Some(1)).unwrap();
 
@@ -75,6 +77,8 @@ pub trait Day {
         let part1_solution = Self::part1(input);
         let elapsed_part_1 = now.elapsed();
 
+        println!("\tpart 1: {}", part1_solution);
+
         #[cfg(debug_assertions)]
         let example_part2_input = &utils::read_input(Self::DAY_NUMBER, Some(2)).unwrap();
 
@@ -88,9 +92,8 @@ pub trait Day {
         let part2_solution = Self::part2(input);
         let elapsed_part_2 = now.elapsed();
 
-        println!("day {}:", Self::DAY_NUMBER);
-        println!("\tpart 1: {}", part1_solution);
         println!("\tpart 2: {}", part2_solution);
+
         println!("\ttime: {:.2?}", elapsed_part_1 + elapsed_part_2);
     }
 }
