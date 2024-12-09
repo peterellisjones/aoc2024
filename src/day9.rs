@@ -4,12 +4,6 @@ use crate::Day;
 
 pub struct Day9;
 
-#[derive(Copy, Clone, Debug, PartialEq)]
-enum Block {
-    Free,
-    File(i64),
-}
-
 impl Day for Day9 {
     const DAY_NUMBER: i64 = 9;
     const PART1_EXAMPLE_SOLUTION: i64 = 1928;
@@ -21,15 +15,10 @@ impl Day for Day9 {
         // compaction with fragmentation
         let mut free_space_idx = 0usize;
         while free_space_idx < blocks.len() {
-            if blocks[free_space_idx] != Block::Free {
+            if blocks[free_space_idx].is_some() {
                 free_space_idx += 1;
-            } else {
-                match blocks.pop().unwrap() {
-                    Block::Free => continue,
-                    Block::File(id) => {
-                        blocks[free_space_idx] = Block::File(id);
-                    }
-                }
+            } else if let Some(file_id) = blocks.pop().unwrap() {
+                blocks[free_space_idx] = Some(file_id);
             }
         }
 
@@ -38,7 +27,7 @@ impl Day for Day9 {
             .iter()
             .enumerate()
             .map(|(idx, block)| -> i64 {
-                if let Block::File(file_id) = block {
+                if let Some(file_id) = block {
                     file_id * (idx as i64)
                 } else {
                     unreachable!("blocks are not correctly compacted");
@@ -50,19 +39,15 @@ impl Day for Day9 {
     fn part2(raw_input: &str) -> i64 {
         // files => file_id, block_id, size
         // free spaces => block_id, size
-        let (mut files, free_spaces) = parse_files_and_free_spaces(raw_input);
+        let (files, free_spaces) = parse_files_and_free_spaces(raw_input);
 
-        // maps free space of starting at block X to free space size
-        let mut free_spaces_by_block_id: BTreeMap<i64, i64> = BTreeMap::new();
-
-        for &(block_id, size) in free_spaces.iter() {
-            free_spaces_by_block_id.insert(block_id, size);
-        }
+        // maps free space starting at block X to free space size
+        let mut free_spaces_by_block_id: BTreeMap<i64, i64> = BTreeMap::from_iter(free_spaces);
 
         let mut updated_files: Vec<(i64, i64, i64)> = Vec::new();
 
         // compaction without fragmentation
-        while let Some((file_id, file_block_id, file_size)) = files.pop() {
+        for &(file_id, file_block_id, file_size) in files.iter().rev() {
             // are there any free blocks before this file that can fit it?
             let free_space = free_spaces_by_block_id
                 .iter()
@@ -77,13 +62,13 @@ impl Day for Day9 {
                 // 2. remove the free space we've used
                 free_spaces_by_block_id.remove(&free_space_block_id);
 
-                // 3. add any remaining space behind the file
+                // 3. add any remaining space behind the file back into the free spaces btree
                 if free_space_size > file_size {
                     free_spaces_by_block_id
                         .insert(free_space_block_id + file_size, free_space_size - file_size);
                 }
             } else {
-                // Else file stays in the same place
+                // file stays in the same place
                 updated_files.push((file_id, file_block_id, file_size));
             }
         }
@@ -127,18 +112,18 @@ fn parse_files_and_free_spaces(raw_input: &str) -> (Vec<(i64, i64, i64)>, Vec<(i
     (file_layout, free_space_layout)
 }
 
-fn parse_blocks(raw_input: &str) -> Vec<Block> {
+fn parse_blocks(raw_input: &str) -> Vec<Option<i64>> {
     let mut blocks = Vec::new();
 
     let mut file_id = 0i64;
     for (idx, c) in raw_input.chars().enumerate() {
         if let Some(digit) = c.to_digit(10) {
             let block = if idx % 2 == 0 {
-                let b = Block::File(file_id);
+                let b = Some(file_id);
                 file_id += 1;
                 b
             } else {
-                Block::Free
+                None
             };
 
             for _ in 0..digit {
