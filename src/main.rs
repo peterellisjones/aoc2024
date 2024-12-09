@@ -10,6 +10,7 @@ mod day5;
 mod day6;
 mod day7;
 mod day8;
+mod day9;
 
 fn main() {
     #[derive(PartialEq)]
@@ -27,6 +28,7 @@ fn main() {
         day6::Day6::run,
         day7::Day7::run,
         day8::Day8::run,
+        day9::Day9::run,
     ];
 
     let mut day_to_run = DayToRun::All;
