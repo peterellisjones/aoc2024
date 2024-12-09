@@ -13,27 +13,19 @@ impl Day for Day9 {
         let mut blocks = parse_blocks(raw_input);
 
         // compaction with fragmentation
-        let mut free_space_idx = 0usize;
-        while free_space_idx < blocks.len() {
-            if blocks[free_space_idx].is_some() {
-                free_space_idx += 1;
+        let mut block_id = 0usize;
+        let mut checksum = 0;
+
+        while block_id < blocks.len() {
+            if let Some(file_id) = blocks[block_id] {
+                checksum += file_id * (block_id as i64);
+                block_id += 1;
             } else if let Some(file_id) = blocks.pop().unwrap() {
-                blocks[free_space_idx] = Some(file_id);
+                blocks[block_id] = Some(file_id);
             }
         }
 
-        // checksum
-        blocks
-            .iter()
-            .enumerate()
-            .map(|(idx, block)| -> i64 {
-                if let Some(file_id) = block {
-                    file_id * (idx as i64)
-                } else {
-                    unreachable!("blocks are not correctly compacted");
-                }
-            })
-            .sum()
+        checksum
     }
 
     fn part2(raw_input: &str) -> i64 {
@@ -44,7 +36,7 @@ impl Day for Day9 {
         // maps free space starting at block X to free space size
         let mut free_spaces_by_block_id: BTreeMap<i64, i64> = BTreeMap::from_iter(free_spaces);
 
-        let mut updated_files: Vec<(i64, i64, i64)> = Vec::new();
+        let mut checksum = 0;
 
         // compaction without fragmentation
         for (file_id, &(file_block_id, file_size)) in files.iter().enumerate().rev() {
@@ -54,10 +46,12 @@ impl Day for Day9 {
                 .take_while(|&(&block_id, _)| block_id < file_block_id)
                 .find(|&(_, &size)| size >= file_size);
 
+            let mut new_file_block_id = file_block_id;
+
             // If we found a free space...
             if let Some((&free_space_block_id, &free_space_size)) = free_space {
                 // 1. store the file in the free space
-                updated_files.push((file_id as i64, free_space_block_id, file_size));
+                new_file_block_id = free_space_block_id;
 
                 // 2. remove the free space we've used
                 free_spaces_by_block_id.remove(&free_space_block_id);
@@ -67,19 +61,14 @@ impl Day for Day9 {
                     free_spaces_by_block_id
                         .insert(free_space_block_id + file_size, free_space_size - file_size);
                 }
-            } else {
-                // file stays in the same place
-                updated_files.push((file_id as i64, file_block_id, file_size));
             }
+
+            // use arithmetic series formula for checksum
+            checksum += (file_id as i64) * (new_file_block_id * 2 + file_size - 1) * file_size / 2;
         }
 
         // checksum
-        updated_files
-            .iter()
-            .map(|&(file_id, file_block_id, file_size)| {
-                file_id * (file_block_id + file_block_id + file_size - 1) * file_size / 2
-            })
-            .sum()
+        checksum
     }
 }
 
