@@ -37,7 +37,7 @@ impl Day for Day9 {
     }
 
     fn part2(raw_input: &str) -> i64 {
-        // files => file_id, block_id, size
+        // files =>  block_id, size
         // free spaces => block_id, size
         let (files, free_spaces) = parse_files_and_free_spaces(raw_input);
 
@@ -47,7 +47,7 @@ impl Day for Day9 {
         let mut updated_files: Vec<(i64, i64, i64)> = Vec::new();
 
         // compaction without fragmentation
-        for &(file_id, file_block_id, file_size) in files.iter().rev() {
+        for (file_id, &(file_block_id, file_size)) in files.iter().enumerate().rev() {
             // are there any free blocks before this file that can fit it?
             let free_space = free_spaces_by_block_id
                 .iter()
@@ -57,7 +57,7 @@ impl Day for Day9 {
             // If we found a free space...
             if let Some((&free_space_block_id, &free_space_size)) = free_space {
                 // 1. store the file in the free space
-                updated_files.push((file_id, free_space_block_id, file_size));
+                updated_files.push((file_id as i64, free_space_block_id, file_size));
 
                 // 2. remove the free space we've used
                 free_spaces_by_block_id.remove(&free_space_block_id);
@@ -69,7 +69,7 @@ impl Day for Day9 {
                 }
             } else {
                 // file stays in the same place
-                updated_files.push((file_id, file_block_id, file_size));
+                updated_files.push((file_id as i64, file_block_id, file_size));
             }
         }
 
@@ -77,27 +77,23 @@ impl Day for Day9 {
         updated_files
             .iter()
             .map(|&(file_id, file_block_id, file_size)| {
-                (file_block_id..(file_block_id + file_size))
-                    .map(|block_id| file_id * block_id)
-                    .sum::<i64>()
+                file_id * (file_block_id + file_block_id + file_size - 1) * file_size / 2
             })
             .sum()
     }
 }
 
-fn parse_files_and_free_spaces(raw_input: &str) -> (Vec<(i64, i64, i64)>, Vec<(i64, i64)>) {
+fn parse_files_and_free_spaces(raw_input: &str) -> (Vec<(i64, i64)>, Vec<(i64, i64)>) {
     let mut file_layout = Vec::new();
     let mut free_space_layout = Vec::new();
 
     let mut block_id = 0i64;
-    let mut file_id = 0i64;
     for (idx, c) in raw_input.chars().enumerate() {
         if let Some(size) = c.to_digit(10) {
             if size > 0 {
                 let size = size as i64;
                 if idx % 2 == 0 {
-                    file_layout.push((file_id, block_id, size));
-                    file_id += 1i64;
+                    file_layout.push((block_id, size));
                 } else {
                     free_space_layout.push((block_id, size));
                 }
