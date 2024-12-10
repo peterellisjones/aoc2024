@@ -38,3 +38,13 @@ pub fn parse_char_grid(input: &str) -> Result<Vec<Vec<char>>, NomError<&str>> {
         .finish()
         .map(|(_, x)| x.iter().map(|&y| y.chars().collect()).collect())
 }
+
+pub fn parse_digit_grid(input: &str) -> Result<Vec<Vec<i32>>, NomError<&str>> {
+    many1(terminated(not_line_ending, line_ending))(input)
+        .finish()
+        .map(|(_, x)| {
+            x.iter()
+                .map(|&y| y.chars().map(|c| c.to_digit(10).unwrap() as i32).collect())
+                .collect()
+        })
+}
