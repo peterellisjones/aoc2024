@@ -12,28 +12,15 @@ impl Day for Day10 {
     const PART2_EXAMPLE_SOLUTION: i64 = 81;
 
     fn part1(raw_input: &str) -> i64 {
-        let peaks = trailhead_reachable_peaks(&raw_input, false);
-
-        peaks
-            .iter()
-            .map(|(_, _, ratings)| ratings.len() as i64)
-            .sum()
+        trailhead_rating_score(&raw_input, false)
     }
 
     fn part2(raw_input: &str) -> i64 {
-        let peaks = trailhead_reachable_peaks(&raw_input, true);
-
-        peaks
-            .iter()
-            .map(|(_, _, ratings)| ratings.iter().map(|(_, &rating)| rating).sum::<i64>())
-            .sum()
+        trailhead_rating_score(&raw_input, true)
     }
 }
 
-fn trailhead_reachable_peaks(
-    raw_input: &str,
-    allow_multiple_routes: bool,
-) -> Vec<(usize, usize, HashMap<(usize, usize), i64>)> {
+fn trailhead_rating_score(raw_input: &str, allow_multiple_routes: bool) -> i64 {
     let input = parse_digit_grid(raw_input).unwrap();
 
     let length = input.len();
@@ -52,27 +39,25 @@ fn trailhead_reachable_peaks(
         .into_par_iter()
         .map(|(trailhead_y, trailhead_x)| {
             let mut visited: HashSet<(usize, usize)> = HashSet::new();
-            let (mut y, mut x) = (trailhead_y, trailhead_x);
 
             // stack keeps track of next squares to explore
-            let mut stack: Vec<(usize, usize)> = Vec::new();
+            let mut stack: Vec<(usize, usize)> = vec![(trailhead_y, trailhead_x)];
 
-            // maps peak to number of ways to reach that peak (always 1 if allow_multiple_routes=false)
-            let mut trail_ratings: HashMap<(usize, usize), i64> = HashMap::new();
+            // trail rating for this trailhead.
+            // if allow_multiple_routes=false then this is just the number of reachable peaks
+            let mut trail_ratings = 0;
 
-            loop {
+            while !stack.is_empty() {
+                let (y, x) = stack.pop().unwrap();
+
                 visited.insert((y, x));
 
                 let next_height = input[y][x] + 1;
-
-                if next_height == 10 {
-                    *trail_ratings.entry((y, x)).or_default() += 1;
-                }
-
                 let mut neighbours = Vec::new();
 
-                // add neighbours
-                if next_height <= 9 {
+                if next_height == 10 {
+                    trail_ratings += 1;
+                } else {
                     if y > 0
                         && input[y - 1][x] == next_height
                         && (allow_multiple_routes || !visited.contains(&(y - 1, x)))
@@ -97,18 +82,12 @@ fn trailhead_reachable_peaks(
                     {
                         neighbours.push((y, x + 1));
                     }
+
+                    stack.extend(neighbours);
                 }
-
-                stack.extend(neighbours.clone());
-
-                if stack.is_empty() {
-                    break;
-                }
-
-                (y, x) = stack.pop().unwrap();
             }
 
-            (trailhead_y, trailhead_x, trail_ratings.clone())
+            trail_ratings
         })
-        .collect()
+        .sum()
 }
