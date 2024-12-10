@@ -50,7 +50,9 @@ fn trailhead_rating_score(raw_input: &str, allow_multiple_routes: bool) -> i64 {
             while !stack.is_empty() {
                 let (y, x) = stack.pop().unwrap();
 
-                visited.insert((y, x));
+                if !allow_multiple_routes {
+                    visited.insert((y, x));
+                }
 
                 let next_height = input[y][x] + 1;
                 let mut neighbours = Vec::new();
