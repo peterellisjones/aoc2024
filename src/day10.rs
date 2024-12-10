@@ -1,8 +1,11 @@
-use std::collections::{HashMap, HashSet};
+use std::collections::HashSet;
 
 use rayon::prelude::*;
 
-use crate::{Day, utils::parse_digit_grid};
+use crate::{
+    Day,
+    utils::{Grid, parse_digit_grid},
+};
 
 pub struct Day10;
 
@@ -21,12 +24,10 @@ impl Day for Day10 {
 }
 
 fn trailhead_rating_score(raw_input: &str, allow_multiple_routes: bool) -> i64 {
-    let input = parse_digit_grid(raw_input).unwrap();
-
-    let length = input.len();
-    let width = input[0].len();
+    let input = Grid(parse_digit_grid(raw_input).unwrap());
 
     let trailheads: Vec<(usize, usize)> = input
+        .0
         .iter()
         .enumerate()
         .map(|(y, row)| row.iter().enumerate().map(move |(x, h)| (y, x, *h)))
@@ -54,36 +55,19 @@ fn trailhead_rating_score(raw_input: &str, allow_multiple_routes: bool) -> i64 {
                     visited.insert((y, x));
                 }
 
-                let next_height = input[y][x] + 1;
+                let next_height = input.0[y][x] + 1;
                 let mut neighbours = Vec::new();
 
                 if next_height == 10 {
                     trail_ratings += 1;
                 } else {
-                    if y > 0
-                        && input[y - 1][x] == next_height
-                        && (allow_multiple_routes || !visited.contains(&(y - 1, x)))
-                    {
-                        neighbours.push((y - 1, x));
-                    }
-                    if y < length - 1
-                        && input[y + 1][x] == next_height
-                        && (allow_multiple_routes || !visited.contains(&(y + 1, x)))
-                    {
-                        neighbours.push((y + 1, x));
-                    }
-                    if x > 0
-                        && input[y][x - 1] == next_height
-                        && (allow_multiple_routes || !visited.contains(&(y, x - 1)))
-                    {
-                        neighbours.push((y, x - 1));
-                    }
-                    if x < width - 1
-                        && input[y][x + 1] == next_height
-                        && (allow_multiple_routes || !visited.contains(&(y, x + 1)))
-                    {
-                        neighbours.push((y, x + 1));
-                    }
+                    input.for_each_neighbour(y, x, |ny, nx, &height| {
+                        if height == next_height
+                            && (allow_multiple_routes || !visited.contains(&(ny, nx)))
+                        {
+                            neighbours.push((ny, nx));
+                        }
+                    });
 
                     stack.extend(neighbours);
                 }

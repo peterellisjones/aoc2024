@@ -34,17 +34,54 @@ pub fn parse_integer_list(input: &str) -> Result<Vec<Vec<i64>>, NomError<&str>> 
 }
 
 pub fn parse_char_grid(input: &str) -> Result<Vec<Vec<char>>, NomError<&str>> {
-    many1(terminated(not_line_ending, line_ending))(input)
-        .finish()
-        .map(|(_, x)| x.iter().map(|&y| y.chars().collect()).collect())
+    parse_grid(input, |c| c)
 }
 
 pub fn parse_digit_grid(input: &str) -> Result<Vec<Vec<i32>>, NomError<&str>> {
+    parse_grid(input, |c| c.to_digit(10).unwrap() as i32)
+}
+
+pub fn parse_grid<T, F: Fn(char) -> T>(
+    input: &str,
+    parse_char: F,
+) -> Result<Vec<Vec<T>>, NomError<&str>> {
     many1(terminated(not_line_ending, line_ending))(input)
         .finish()
         .map(|(_, x)| {
             x.iter()
-                .map(|&y| y.chars().map(|c| c.to_digit(10).unwrap() as i32).collect())
-                .collect()
+                .map(|&y| y.chars().map(|c| parse_char(c)).collect::<Vec<T>>())
+                .collect::<Vec<Vec<T>>>()
         })
+}
+
+pub struct Grid<T>(pub Vec<Vec<T>>);
+
+impl<T> Grid<T> {
+    pub fn width(self: &Self) -> usize {
+        self.0[0].len()
+    }
+
+    pub fn height(self: &Self) -> usize {
+        self.0.len()
+    }
+
+    pub fn for_each_neighbour<F: FnMut(usize, usize, &T)>(
+        self: &Self,
+        y: usize,
+        x: usize,
+        mut callback: F,
+    ) {
+        if y > 0 {
+            callback(y - 1, x, &self.0[y - 1][x]);
+        }
+        if y < self.height() - 1 {
+            callback(y + 1, x, &self.0[y + 1][x]);
+        }
+        if x > 0 {
+            callback(y, x - 1, &self.0[y][x - 1]);
+        }
+        if x < self.width() - 1 {
+            callback(y, x + 1, &self.0[y][x + 1]);
+        }
+    }
 }
