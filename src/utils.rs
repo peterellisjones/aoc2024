@@ -33,6 +33,12 @@ pub fn parse_integer_list(input: &str) -> Result<Vec<Vec<i64>>, NomError<&str>> 
         .map(|(_, x)| x)
 }
 
+pub fn parsed_space_separated_integers(input: &str) -> Result<Vec<i64>, NomError<&str>> {
+    terminated(separated_list1(space1, nom_i64), line_ending)(input)
+        .finish()
+        .map(|(_, x)| x)
+}
+
 pub fn parse_char_grid(input: &str) -> Result<Vec<Vec<char>>, NomError<&str>> {
     parse_grid(input, |c| c)
 }
