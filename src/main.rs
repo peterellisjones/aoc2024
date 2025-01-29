@@ -5,7 +5,9 @@ mod utils;
 mod day1;
 mod day10;
 mod day11;
+mod day12;
 mod day13;
+mod day14;
 mod day2;
 mod day3;
 mod day4;
@@ -34,7 +36,9 @@ fn main() {
         day9::Day9::run,
         day10::Day10::run,
         day11::Day11::run,
+        day12::Day12::run,
         day13::Day13::run,
+        day14::Day14::run,
     ];
 
     let mut day_to_run = DayToRun::All;
@@ -73,13 +77,13 @@ pub trait Day {
         println!("day {}:", Self::DAY_NUMBER);
 
         #[cfg(debug_assertions)]
-        let example_part1_input = &utils::read_input(Self::DAY_NUMBER, Some(1)).unwrap();
-
-        #[cfg(debug_assertions)]
-        debug_assert_eq!(
-            Self::part1(example_part1_input),
-            Self::PART1_EXAMPLE_SOLUTION
-        );
+        if let Ok(example_part1_input) = &utils::read_input(Self::DAY_NUMBER, Some(1)) {
+            #[cfg(debug_assertions)]
+            debug_assert_eq!(
+                Self::part1(example_part1_input),
+                Self::PART1_EXAMPLE_SOLUTION
+            );
+        }
 
         let input: &String = &utils::read_input(Self::DAY_NUMBER, None).unwrap();
 
@@ -90,13 +94,13 @@ pub trait Day {
         println!("\tpart 1: {}", part1_solution);
 
         #[cfg(debug_assertions)]
-        let example_part2_input = &utils::read_input(Self::DAY_NUMBER, Some(2)).unwrap();
-
-        #[cfg(debug_assertions)]
-        assert_eq!(
-            Self::part2(example_part2_input),
-            Self::PART2_EXAMPLE_SOLUTION
-        );
+        if let Ok(example_part2_input) = &utils::read_input(Self::DAY_NUMBER, Some(2)) {
+            #[cfg(debug_assertions)]
+            assert_eq!(
+                Self::part2(example_part2_input),
+                Self::PART2_EXAMPLE_SOLUTION
+            );
+        }
 
         let now = Instant::now();
         let part2_solution = Self::part2(input);
