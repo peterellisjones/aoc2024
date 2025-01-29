@@ -5,6 +5,7 @@ mod utils;
 mod day1;
 mod day10;
 mod day11;
+mod day13;
 mod day2;
 mod day3;
 mod day4;
@@ -33,6 +34,7 @@ fn main() {
         day9::Day9::run,
         day10::Day10::run,
         day11::Day11::run,
+        day13::Day13::run,
     ];
 
     let mut day_to_run = DayToRun::All;

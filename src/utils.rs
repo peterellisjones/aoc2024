@@ -15,7 +15,15 @@ pub fn read_input(problem_number: i64, example: Option<i64>) -> Result<String, s
         format!("assets/day{problem_number}.txt")
     };
 
-    read_to_string(file_path)
+    let ret = read_to_string(&file_path);
+
+    if let Err(e) = &ret {
+        if e.kind() == std::io::ErrorKind::NotFound {
+            eprintln!("Warning: File not found: {}", &file_path);
+        }
+    }
+
+    ret
 }
 
 pub fn parse_integer_pairs(input: &str) -> Result<Vec<(i64, i64)>, NomError<&str>> {
